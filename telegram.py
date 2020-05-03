@@ -6,13 +6,16 @@ import time
 import threading
 import picamera
 import psutil
+import requests
+import socket
 from ffmpeg_streaming import Formats
 
 api_key = os.getenv('TELE_APIKEY')
 print("Starting Baby monitor application")
 tb = telebot.TeleBot(api_key)
+port = "5000"
 
-@tb.message_handler(func=lambda msg: '/help' in msg.text)
+#@tb.message_handler(func=lambda msg: '/help' in msg.text)
 
 @tb.message_handler(func=lambda msg: '/stats' in msg.text)
 def stats_handler(message):
@@ -48,19 +51,36 @@ def room_handler(message):
     
 @tb.message_handler(func=lambda msg: '/video' in msg.text)
 def video_handler(message):
+    host = get_ip()
     # start a video stream
     #tb.reply_to(message, "This will start a video stream and give the link")
     th = threading.Thread(target=app.run)
     th.start()
     
-    tb.reply_to(message, "Starting video stream\nGO to https://192.168.0.150:5000/video")
+    tb.reply_to(message, "Starting video stream\nGO to http://%s:%s/video" %(host, port,))
 
+@tb.message_handler(func=lambda msg: '/stopvideo' in msg.text)
+def video_stop_handler(message):
+    host = get_ip()
+    requests.post("http://%s:%s/shutdown" %(host, port,))
+    tb.reply_to(message, "Stopping video stream")
+    
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('8.8.8.8', 1))
+        ip = s.getsockname()[0]
+    except:
+        ip = '127.0.0.1'
+    finally:
+        s.close()
+    return ip
 
 if __name__ == '__main__':
+    print("Connecting to Telegram")
     while True:
         try:
             tb.polling()
-            print("Connected to Telegram")
         except KeyboardInterrupt:
             print("EXIT")
             break
