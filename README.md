@@ -1,3 +1,5 @@
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/schizoid90/baby-monitor) 
+
 # Baby Monitor
 
 A baby monitor written in Python that is controlled via telegram. 
