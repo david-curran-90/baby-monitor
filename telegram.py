@@ -14,8 +14,21 @@ api_key = os.getenv('TELE_APIKEY')
 print("Starting Baby monitor application")
 tb = telebot.TeleBot(api_key)
 port = "5000"
+giturl = "https://github.com/schizoid90/baby-monitor"
 
-#@tb.message_handler(func=lambda msg: '/help' in msg.text)
+@tb.message_handler(func=lambda msg: '/help' in msg.text)
+def help_handler(message):
+    reply = """
+    This bot can control your Raspberry Pi baby monitor.
+    View %s for more details.
+    /help - show this message
+    /stats - show stats about the Pi
+    /picture - take a picture and send it through telegram
+    /video - start a video stream
+    /stopvideo - stop the video stream
+    /room - information about the room taken from sensors
+    """ % (giturl)
+    tb.reply_to(message, reply)
 
 @tb.message_handler(func=lambda msg: '/stats' in msg.text)
 def stats_handler(message):
