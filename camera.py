@@ -1,5 +1,6 @@
 import cv2
 
+# use cv2 to capture images and stream them as video
 class VideoCamera(object):
     def __init__(self):
         # Using OpenCV to capture from device 0

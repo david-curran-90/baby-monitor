@@ -11,22 +11,28 @@ import requests
 import socket
 from ffmpeg_streaming import Formats
 
+# set up some simple logging to ./app.log
 log_level = logging.INFO
 logging.basicConfig(filename='app.log',
                     filemode='w',
                     format='%(name)s - %(levelname)s - %(message)s',
                     level=log_level)
 
+# set up global variables 
 api_key = os.getenv('TELE_APIKEY')
-logging.info("Starting Baby monitor application")
-tb = telebot.TeleBot(api_key)
 port = "5000"
 giturl = "https://github.com/schizoid90/baby-monitor"
 
-# enable some modules
+# 
+logging.info("Starting Baby monitor application")
+tb = telebot.TeleBot(api_key)
+
+
+# enable some modules for one wire use
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
+# set up a /help route to let the users know how to interact with the bot
 @tb.message_handler(func=lambda msg: '/help' in msg.text)
 def help_handler(message):
     reply = """
@@ -41,6 +47,7 @@ def help_handler(message):
     """ % (giturl)
     tb.reply_to(message, reply)
 
+# function to give hardware status information
 @tb.message_handler(func=lambda msg: '/status' in msg.text)
 def stats_handler(message):
     #temp = list(psutil.sensors_temperatures()['cpu-thermal'][0])[1]
@@ -52,26 +59,30 @@ def stats_handler(message):
     reply = "%s\nCPU Usage - %s\nFree RAM - %sMB\nFree Disk space %sGB" %(status, cpu, mem, disk)
     tb.reply_to(message, reply)
     
+# take a picture and send it as a reply
 @tb.message_handler(func=lambda msg: '/picture' in msg.text)
 def picture_handler(message):
     output = "bot_pic-%s.jpg" %(time.time())
     with picamera.PiCamera() as camera:
+        # set picture details and take picture after warm up
         camera.resolution = (1024, 768)
         camera.start_preview()
         # Camera warm-up time
         time.sleep(2)
         camera.capture(output)
         logging.info('Picture taken')
+        # try to send picture but send error message if it fails
         try:
             with open(output, 'rb') as photo:
                 tb.send_photo(message.chat.id, photo)
         except Exception as e:
             tb.reply_to(message, "couldn't send picture\n%s" %(e))
-        os.remove(output)
+        finally:
+            os.remove(output)
 
+# give information about the room the PI is placed in
 @tb.message_handler(func=lambda msg: '/room' in msg.text)
 def room_handler(message):
-    # get details of room temperature and reply to user
     temp_sensor = get_temp_sensor_file()
     if temp_sensor == "error":
         tb.reply_to(message, "Could not find any temperature sensor")
@@ -101,6 +112,7 @@ def get_temp_sensor_file():
         return "error"
 
 def get_temp_info(file):
+    # get lines from the temp sensor file
     try:
         with open(file, 'r') as f:
             lines = f.readlines()
@@ -109,6 +121,7 @@ def get_temp_info(file):
     return lines
 
 def get_temp(lines):
+    # extract the temperature from the file
     temp_output = lines[1].find('t=')
 
     if temp_output != -1:
@@ -116,6 +129,7 @@ def get_temp(lines):
         temp_c = float(temp_string) / 1000.0
         return temp_c
     
+# start a flask server serving video
 @tb.message_handler(func=lambda msg: '/video' in msg.text)
 def video_handler(message):
     host = get_ip()
@@ -125,12 +139,13 @@ def video_handler(message):
     
     tb.reply_to(message, "Starting video stream\nGO to http://%s:%s/video" %(host, port,))
 
+# send a POST connection to shutdown flask
 @tb.message_handler(func=lambda msg: '/stopvideo' in msg.text)
 def video_stop_handler(message):
-    host = get_ip()
-    requests.post("http://%s:%s/shutdown" %(host, port,))
+    requests.post("http://%s:%s/shutdown" %(get_ip(), port,))
     tb.reply_to(message, "Stopping video stream")
     
+# get the device IP
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:

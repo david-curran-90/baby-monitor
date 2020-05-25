@@ -3,10 +3,12 @@ from camera import VideoCamera
 
 app = Flask(__name__)        
 
+# will fail as there's no index.html
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# returns a still image from the camera
 def gen(camera):
     while True:
         frame = camera.get_frame()
@@ -18,6 +20,7 @@ def video_feed():
     return Response(gen(VideoCamera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+# nice secure method for shutdown
 @app.route('/shutdown', methods=['POST'])
 def shutdown():
     func = request.environ.get('werkzeug.server.shutdown')
