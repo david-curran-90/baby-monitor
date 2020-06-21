@@ -22,6 +22,26 @@ python3 -m pip install -r requirements.txt
 sudo apt install libatlas-base-dev libjasper-dev libqtgui4 libqt4-test python3-pyqt5 python3-opencv
 ```
 
+## install
+
+```
+git clone https://github.com/schizoid90/baby-monitor.git
+```
+
+Edit the `monitor.service` file to point to where you've downloaded the script to
+
+```
+ExecStart=/usr/bin/python3 {/path/to/your/script}
+```
+
+Then you should be able to start the monitor application with systemd
+
+```shell
+sudo systemctl daemon-reload
+sudo systemctl enable monitor.service
+sudo systemctl start monitor.service
+```
+
 ## Usage
 
 * start
@@ -35,7 +55,7 @@ This will start a connection to your telegram bot and start listening for comman
 
 type `/help` in your chat screen to see a list of commands
 
-## Video
+### Video
 
 Video streaming is served via flask and shows a stream of *jpg* images on port 5000
 
@@ -45,6 +65,6 @@ Start by sending `/video` and stop with `/stopvideo`. It is also possible to sen
 curl -X POST http://192.168.0.150:5000/shutdown
 ```
 
-## Picture
+### Picture
 
-Yuo can instruct the Pi to take a pciture and send it to that chat with `/picture`. This will also delete the picture sending so there's no need to worry about storage.
+You can instruct the Pi to take a pciture and send it to that chat with `/picture`. This will also delete the picture sending so there's no need to worry about storage.
