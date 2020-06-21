@@ -1,4 +1,4 @@
-import app
+from . import app
 import ffmpeg_streaming
 import os
 import telebot
@@ -41,8 +41,8 @@ def help_handler(message):
     /help - show this message
     /status - show stats about the Pi
     /picture - take a picture and send it through telegram
-    /video - start a video stream
-    /stopvideo - stop the video stream
+    /stream - start a the streaming server
+    /stopstream - stop the streaming server
     /room - information about the room taken from sensors
     """ % (giturl)
     tb.reply_to(message, reply)
@@ -130,20 +130,20 @@ def get_temp(lines):
         return temp_c
     
 # start a flask server serving video
-@tb.message_handler(func=lambda msg: '/video' in msg.text)
+@tb.message_handler(func=lambda msg: '/stream' in msg.text)
 def video_handler(message):
     host = get_ip()
     # start a video stream
     th = threading.Thread(target=app.run)
     th.start()
     
-    tb.reply_to(message, "Starting video stream\nGO to http://%s:%s/video" %(host, port,))
+    tb.reply_to(message, "Starting stream\nGO to http://%s:%s/video\nOR http://%s:%s/audio" %(host, port, host, port))
 
 # send a POST connection to shutdown flask
-@tb.message_handler(func=lambda msg: '/stopvideo' in msg.text)
+@tb.message_handler(func=lambda msg: '/stopstream' in msg.text)
 def video_stop_handler(message):
     requests.post("http://%s:%s/shutdown" %(get_ip(), port,))
-    tb.reply_to(message, "Stopping video stream")
+    tb.reply_to(message, "Stopping stream")
     
 # get the device IP
 def get_ip():

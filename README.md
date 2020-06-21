@@ -34,6 +34,14 @@ Edit the `monitor.service` file to point to where you've downloaded the script t
 ExecStart=/usr/bin/python3 {/path/to/your/script}
 ```
 
+Move the file into place (systemd)
+
+```shell
+sudo mv monitor.service /etc/systemd/system/monitor.service
+sudo chown root:root /etc/systemd/system/monitor.service
+sudo chmod +x /etc/systemd/system/monitor.service
+```
+
 Then you should be able to start the monitor application with systemd
 
 ```shell
