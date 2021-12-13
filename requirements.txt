@@ -2,5 +2,5 @@ flask>=1.0.2
 picamera>=1.13
 pyaudio
 pyTelegramBotAPI>=3.7.0
-opencv-python==3.4.3.18
+opencv-python==4.2.0.32
 requests>=2.21.0
