@@ -11,6 +11,6 @@ spec:
       containers:
       - name: pi
         image: perl:5.34.0
-        command: ["perl", "sleep(300)"]
+        command: ["sleep(300)"]
       restartPolicy: Never
   backoffLimit: 4
