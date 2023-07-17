@@ -11,17 +11,7 @@ spec:
       containers:
       - name: pi
         image: ubuntu:22.04
-        command:
-        - /bin/bash
-        - for
-        - i
-        - in
-        - {1..30}
-        - do
-        - echo
-        - "$i"
-        - &&
-        - sleep 2
-        - done
+        command: ["/bin/bash"]
+        args: ["-c", "sleep", "300"]
       restartPolicy: Never
   backoffLimit: 4
