@@ -14,6 +14,6 @@ spec:
         command:
         - /bin/bash
         - sleep
-        - 300
+        - "300"
       restartPolicy: Never
   backoffLimit: 4
