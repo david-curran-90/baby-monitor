@@ -12,6 +12,6 @@ spec:
       - name: pi
         image: ubuntu:22.04
         command: ["/bin/bash"]
-        args: ["-c", "sleep", "300"]
+        args: ["-c", "echo running; sleep 300"]
       restartPolicy: Never
   backoffLimit: 4
