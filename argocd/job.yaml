@@ -13,7 +13,15 @@ spec:
         image: ubuntu:22.04
         command:
         - /bin/bash
-        - sleep
-        - "300"
+        - for
+        - i
+        - in
+        - {1..30}
+        - do
+        - echo
+        - "$i"
+        - &&
+        - sleep 2
+        - done
       restartPolicy: Never
   backoffLimit: 4
